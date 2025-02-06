@@ -25,7 +25,7 @@ def read_aasx_file(aasx_path):
         with aasx.open(target_xml_file) as xml_file:
             xml_content = xml_file.read()
 
-        dict_data = xml_to_dict(xml_content)
+        dict_data = xml_to_dict(xml_content.decode('utf-8'))
         aas_data, submodel_data = dict_to_json(dict_data)
         
         return aas_data, submodel_data, target_file_name
@@ -38,7 +38,7 @@ def read_aasx_file(aasx_path):
 
 # XML 데이터를 딕셔너리로 변환
 def xml_to_dict(xml_data):
-    return xmltodict.parse(ET.tostring(xml_data))
+    return xmltodict.parse(xml_data)
 
 
 # 딕셔너리 데이터를 JSON으로 변환

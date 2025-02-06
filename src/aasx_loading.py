@@ -2,6 +2,9 @@ import zipfile
 from collections import defaultdict
 import xml.etree.ElementTree as ET
 
+import xmltodict
+import json
+
 
 # AASX 파일 Loading
 def read_aasx_file(aasx_path):
@@ -20,33 +23,29 @@ def read_aasx_file(aasx_path):
                 break
         
         with aasx.open(target_xml_file) as xml_file:
-            tree = ET.parse(xml_file)
+            xml_content = xml_file.read()
 
-            return tree, target_file_name
+        dict_data = xml_to_dict(xml_content)
+        aas_data, submodel_data = dict_to_json(dict_data)
+        
+        return aas_data, submodel_data, target_file_name
+    
 
     except Exception as e:
         print(f"AASX 파일 Loading 중 오류 발생: {e}")
         return None
-    
 
-def extract_xml_data(root):
-    
-    # root = xml_data.getroot()
-    data_collection = defaultdict(list)
 
-    print(root)
-    for aas in root.findall(".//AssetAdministrationShell"):
-        aas_id = aas.find("id").text if aas.find("id") is not None else "Unknown_AAS"
-        data_collection["AAS"].append({"id": aas_id, "xml": aas})
+# XML 데이터를 딕셔너리로 변환
+def xml_to_dict(xml_data):
+    return xmltodict.parse(ET.tostring(xml_data))
 
-    # Submodels 추출
-    for submodel in root.findall(".//Submodel"):
-        submodel_id = submodel.find("id").text if submodel.find("id") is not None else "Unknown_Submodel"
-        data_collection["Submodels"].append({"id": submodel_id, "xml": submodel})
 
-    # ConceptDescriptions 추출
-    for concept in root.findall(".//ConceptDescription"):
-        concept_id = concept.find("id").text if concept.find("id") is not None else "Unknown_ConceptDescription"
-        data_collection["ConceptDescriptions"].append({"id": concept_id, "xml": concept})
+# 딕셔너리 데이터를 JSON으로 변환
+def dict_to_json(dict_data):
+    aas_data = dict_data['environment']['assetAdministrationShells']['assetAdministrationShell']
+    submodel_data = dict_data['environment']['submodels']['submodel']
 
-    return data_collection
+    return json.dumps(aas_data, indent=4, ensure_ascii=False), json.dumps(submodel_data, indent=4, ensure_ascii=False)
+
+

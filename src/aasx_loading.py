@@ -26,13 +26,15 @@ def read_aasx_file(aasx_path):
             xml_content = xml_file.read()
 
         dict_data = xml_to_dict(xml_content.decode('utf-8'))
-        aas_data, submodel_data = dict_to_json(dict_data)
+        aas_data, submodel_data = dict_structure(dict_data)
         
+
         return aas_data, submodel_data, target_file_name
     
 
     except Exception as e:
         print(f"AASX 파일 Loading 중 오류 발생: {e}")
+
         return None
 
 
@@ -41,11 +43,24 @@ def xml_to_dict(xml_data):
     return xmltodict.parse(xml_data)
 
 
-# 딕셔너리 데이터를 JSON으로 변환
-def dict_to_json(dict_data):
+# 딕셔너리 데이터 구조 변환
+def dict_structure(dict_data):
     aas_data = dict_data['environment']['assetAdministrationShells']['assetAdministrationShell']
     submodel_data = dict_data['environment']['submodels']['submodel']
 
-    return json.dumps(aas_data, indent=4, ensure_ascii=False), json.dumps(submodel_data, indent=4, ensure_ascii=False)
+    # aas_data_list, submodel_data_list = [], []
+
+    # for aas in aas_data:
+    #     json_data = dict_to_json(aas)
+    #     aas_data_list.append(json_data)
+
+    # for submodel in submodel_data:
+    #     json_data = dict_to_json(submodel)
+    #     submodel_data_list.append(json_data)
+
+    return aas_data, submodel_data
 
 
+# 딕셔너리 데이터를 JSON으로 변환
+def dict_to_json(dict_data):
+    return json.dumps(dict_data, indent=4, ensure_ascii=False)

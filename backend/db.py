@@ -24,17 +24,29 @@ def create_collection(DB):
 
     return repo_list
     
-
 # 데이터 삽입 함수
 def insert_data(collection, data):
     for doc in data:
         collection.insert_one(doc)
 
+# DB 조회 함수
+def find_DB_data():
+    dbs = mongo_client.list_database_names()
+    dbs = [db for db in dbs if db not in ['admin','local','config']]
+    return dbs
 
-# # 데이터 조회 함수
-# def find_data(collection_name, query={}):
-#     collection = get_collection(collection_name)
-#     return list(collection.find(query))
+# 특정 DB Collection 조회 함수
+def find_collecion_data(DB_name):
+    db = mongo_client[DB_name]
+    collections = db.list_collection_names()
+    return collections
+
+# 특정 collection의 document 조회 함수
+def find_document_data(DB_name, collection_name):
+    db = mongo_client[DB_name]
+    collection = db[collection_name]
+    documents = list(collection.find())
+    return documents
 
 # # 데이터 업데이트 함수
 # def update_data(collection_name, query, new_values):

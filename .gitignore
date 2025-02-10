@@ -6,3 +6,4 @@ env/
 *.env
 config/
 aasx_file/
+xml_file/

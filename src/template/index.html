@@ -1,0 +1,70 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>실시간 그래프</title>
+    <!-- Socket.IO 클라이언트 라이브러리 (Flask-SocketIO와 버전 맞추기) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+    <!-- Chart.js 라이브러리 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h2>실시간 온도 그래프</h2>
+    <canvas id="myChart" width="600" height="400"></canvas>
+
+    <script>
+        // Chart.js 초기 설정
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],  // 시간 레이블
+                datasets: [{
+                    label: '온도',
+                    data: [],
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: '시간'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: '온도'
+                        }
+                    }
+                }
+            }
+        });
+
+        // 웹소켓 연결
+        const socket = io();
+
+        // 서버로부터 데이터 수신
+        socket.on('new_data', function(data) {
+            console.log('새 데이터 수신:', data);
+            // 새로운 시간 및 온도 값을 차트에 추가
+            myChart.data.labels.push(data.time);
+            myChart.data.datasets[0].data.push(data.temperature);
+
+            // 예시: 최신 20개 데이터만 유지
+            if (myChart.data.labels.length > 20) {
+                myChart.data.labels.shift();
+                myChart.data.datasets[0].data.shift();
+            }
+
+            myChart.update();
+        });
+    </script>
+</body>
+</html>

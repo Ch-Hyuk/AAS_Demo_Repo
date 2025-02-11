@@ -1,11 +1,11 @@
 // App.js
 import React from 'react';
-import MongoHierarchy from './MongoHierarchy_1';
+import TreeGridView from './TreeGridView';
 
 function App() {
   return (
     <div className="App">
-      <MongoHierarchy />
+      <TreeGridView />
     </div>
   );
 }

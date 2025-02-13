@@ -2,13 +2,14 @@ import json
 
 
 def load_config(filename:str) -> dict:
-    with open(filename) as f:
+    with open(filename, 'r', encoding='utf-8') as f:
         return json.load(f)
 
 
 CONFIG = {
     "InfluxDB":load_config('./config/InfluxDB.json'),
     "MongoDB":load_config('./config/MongoDB.json'),
-    "MySQL":load_config('./config/MySQL.json')
-    
+    "PostgreSQL":load_config('./config/PostgreSQL.json')
 }
+
+print("CONFIG file loaded")

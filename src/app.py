@@ -7,7 +7,7 @@ import time
 
 import os
 
-from backend.db import DB_create, create_collection, insert_data
+from backend.mongodb import DB_create, create_collection, insert_data
 from aasx_loading import read_aasx_file
 
 app = Flask(__name__)

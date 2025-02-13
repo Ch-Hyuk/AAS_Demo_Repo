@@ -2,7 +2,7 @@ from flask import Flask, jsonify, Response
 from flask_cors import CORS
 from bson.json_util import dumps
 
-from db import find_DB_data, find_collecion_data, find_document_data, find_aas_data
+from backend.mongodb import find_DB_data, find_collecion_data, find_document_data, find_aas_data
 
 app = Flask(__name__)
 CORS(app)  # 모든 도메인에서의 요청 허용

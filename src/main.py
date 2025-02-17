@@ -1,7 +1,7 @@
 import os
 
 from backend.mongodb import DB_create, create_collection, insert_data
-from backend.aasx_loading import read_aasx_file
+from backend.data_uploading.aasx_loading import read_aasx_file
 
 
 def main():

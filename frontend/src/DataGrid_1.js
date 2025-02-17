@@ -199,7 +199,7 @@ const DataGrid = () => {
     },
     width: 300,
     minWidth: 300,
-    maxWidth: 500,
+    maxWidth: 300,
     resizable: true,
     cellStyle: (params) => {
       switch (params.node.level) {
@@ -230,7 +230,7 @@ const DataGrid = () => {
       headerName: 'Value',
       width: 200,
       minWidth: 100,
-      maxWidth: 300,
+      maxWidth: 200,
       resizable: true
     }
   ];
@@ -242,7 +242,10 @@ const DataGrid = () => {
   }
 
   return (
-    <div className="ag-theme-alpine" style={{ height: 1000, width: '100%', overflow: 'auto', border: '1px solid #ccc', padding: '10px' }}>
+    <div>
+      <h2 style={{ textAlign: "center" }}>DemoKit AAS 구조</h2>
+      
+    <div className="ag-theme-alpine" style={{ height: 1000, width: '100%', overflow: 'auto', border: '1px solid #ccc'}}>
       <AgGridReact
         rowData={rowData}
         columnDefs={columnDefs}
@@ -251,6 +254,7 @@ const DataGrid = () => {
         groupDefaultExpanded={-1}
         autoGroupColumnDef={autoGroupColumnDef}
       />
+    </div>
     </div>
   );
 };

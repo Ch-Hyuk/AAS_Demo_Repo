@@ -1,17 +1,21 @@
+// index.js
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
 import App from './App';
-import reportWebVitals from './reportWebVitals';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+import 'ag-grid-enterprise';
+
+import { ModuleRegistry } from '@ag-grid-community/core';
+import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
+
+// 반드시 모든 다른 코드보다 먼저 실행되어야 합니다.
+ModuleRegistry.registerModules([ClientSideRowModelModule]);
+
+// React 18 방식으로 createRoot를 사용하여 렌더링합니다.
+const container = document.getElementById('root');
+const root = ReactDOM.createRoot(container);
 root.render(
   <React.StrictMode>
     <App />
   </React.StrictMode>
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();

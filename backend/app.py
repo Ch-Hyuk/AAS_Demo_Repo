@@ -2,7 +2,7 @@ from flask import Flask, jsonify, Response
 from flask_cors import CORS
 from bson.json_util import dumps
 
-from backend.mongodb import find_DB_data, find_collecion_data, find_document_data, find_aas_data
+from mongodb import find_DB_data, find_collecion_data, find_document_data, find_aas_data
 
 app = Flask(__name__)
 CORS(app)  # 모든 도메인에서의 요청 허용
@@ -33,7 +33,7 @@ def get_aas(db_name, collection_name):
 
 # Submodel 목록 반환
 @app.route('/api/<string:db_name>/collections/<string:collection_name>/<string:aas_name>/submodel', methods=['GET'])
-def get_aas(db_name, collection_name, aas_name):
+def get_submodel(db_name, collection_name, aas_name):
     return Response(dumps(find_aas_data(db_name, collection_name, aas_name)), mimetype='application/json')
 
 

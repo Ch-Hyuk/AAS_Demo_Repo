@@ -1,15 +1,15 @@
 import os
 
-from backend.mongodb import DB_create, create_collection, insert_data
-from backend.aasx_loading import read_aasx_file
+from mongodb import DB_create, create_collection, insert_data
+from aasx_loading import read_aasx_file
 
 
 def main():
-    file_name = 'DemoKit.aasx'
+    file_name = 'test.aasx'
     aasx_file_path = os.path.join(os.getcwd(), 'aasx_file', file_name)
     aas_data, submodel_data, DB_name = read_aasx_file(aasx_file_path)
-
-    print("aas_data: ",type(aas_data[0]))
+    print(type(aas_data))
+    # print("aas_data: ",type(aas_data[0]))
     print("DB_name: ",DB_name) 
 
 

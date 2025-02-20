@@ -5,11 +5,11 @@ from aasx_loading import read_aasx_file
 
 
 def main():
-    file_name = 'test.aasx'
+    file_name = 'Demokit.aasx'
     aasx_file_path = os.path.join(os.getcwd(), 'aasx_file', file_name)
     aas_data, submodel_data, DB_name = read_aasx_file(aasx_file_path)
     print(type(aas_data))
-    # 단일 aas인 aasx 파일은 오류류
+    # 단일 aas인 aasx 파일은 오류
     # print("aas_data: ",type(aas_data[0]))
     print("DB_name: ",DB_name) 
 

@@ -36,3 +36,16 @@
     transform: rotate(360deg);
   }
 }
+
+.ag-theme-balham .ag-header-cell:not(.ag-header-group-cell) .ag-header-cell-label {
+  font-size: 20px;
+  color:rgb(37, 37, 39);  /* 초록색 텍스트 */
+  font-weight: bold;
+}
+
+
+.ag-theme-balham .ag-header-group-cell {
+  font-size: 18px;
+  color:rgb(170, 91, 0);  /* 초록색 텍스트 */
+  font-weight: normal;
+}

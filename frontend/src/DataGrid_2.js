@@ -8,7 +8,7 @@ function App() {
 
   // 🔹 Flask API에서 fetch를 통해 데이터 가져오기
   useEffect(() => {
-    fetch("http://127.0.0.1:5000/data/demokit_col")
+    fetch("http://127.0.0.1:5000/data/demokit_mapping")
       .then((response) => {
         if (!response.ok) {
           throw new Error(`네트워크 응답 오류: ${response.status}`);
@@ -25,20 +25,18 @@ function App() {
 
   // 🔹 컬럼 정의
   const columnDefs = [
-    { field: "id", headerName: "ID", width: 100 },
-    { field: "semantic_data_en", headerName: "Semantic Data(en)", flex: 1, width: 300 },
-    { field: "semantic_data_kr", headerName: "Semantic Data(kr)", flex: 1, width: 300 },
-    { field: "aas_mapping_path", headerName: "AAS Mapping Path", flex: 2, width: 300 },
-    { field: "data_description_en", headerName: "Description(en)", flex: 1, width: 1000 },
-    { field: "data_description_kr", headerName: "description(kr)", flex: 1 },
+    { field: "opcua_tag_name", headerName: "OPC-UA Tag Name", flex: 1, width: '100%' },
+    { field: "semantic_data_en", headerName: "Semantic Data(en)", flex: 1, width: '100%' },
+    { field: "semantic_data_kr", headerName: "Semantic Data(kr)", flex: 1, width: '100%' },
+    { field: "data_description_kr", headerName: "Description(kr)", flex: 1, width: '100%' },
     { field: "plc_address", headerName: "PLC Address", flex: 1 },
   ];
 
   return (
-    <div>
-      <h2 style={{ textAlign: "center" }}>📊 Mapping Data</h2>
+    <div style={{ height: '100%', width: 1500}}>
+      <h2 style={{ textAlign: "center", width: '100%' }}>📊 Mapping Data</h2>
       {/* 고정 높이를 가진 그리드 컨테이너 */}
-      <div className="ag-theme-alpine" style={{ height: 1000, width: "100%" }}>
+      <div className="ag-theme-alpine" style={{ height: 800, width: "100%" }}>
         <AgGridReact
           rowData={rowData}
           columnDefs={columnDefs}

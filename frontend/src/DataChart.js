@@ -1,122 +1,162 @@
-import React, { useEffect, useState } from "react";
-import { Line } from "react-chartjs-2";
+// RealTimeMultiCharts.jsx
+import React, { useState, useEffect, useRef } from 'react';
+import io from 'socket.io-client';
+import { AgGridReact } from 'ag-grid-react';
+import { Line, Bar } from 'react-chartjs-2';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-balham.css';
+import 'ag-grid-community/styles/ag-theme-alpine.css';
+import './App.css'
+
+// Chart.js 모듈 등록
 import {
   Chart as ChartJS,
   LineElement,
+  BarElement,
   CategoryScale,
   LinearScale,
   PointElement,
   Title,
   Tooltip,
   Legend,
-} from "chart.js";
+  plugins,
+} from 'chart.js';
 
-// Chart.js에 필요한 모듈 등록
-ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Title, Tooltip, Legend);
+ChartJS.register(
+  LineElement,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
-// 컬럼별 색상을 지정하는 함수 (필요에 따라 확장)
-const getColor = (index) => {
-  const colors = [
-    "rgba(75,192,192,1)",
-    "rgba(255,99,132,1)",
-    "rgba(153,102,255,1)",
-    "rgba(255,159,64,1)",
-    "rgba(54,162,235,1)",
-    // 추가 색상…
-  ];
-  return colors[index % colors.length];
-};
-
-const DataChart = () => {
-  // mapping 데이터와 row 데이터를 따로 관리
-  const [mappingData, setMappingData] = useState([]);
+const RealTimeMultiCharts = () => {
   const [rowData, setRowData] = useState([]);
+  const gridRef = useRef(null);
+  const socketRef = useRef(null);
 
+  // AG-Grid 컬럼 설정 (타임스탬프와 3개의 값)
+  const [columnDefs, setColumnDefs] = useState([]);
+
+  // 외부 API를 호출하여 컬럼 헤더명을 받아옴
   useEffect(() => {
-    // 1. mapping 정보를 API에서 받아오기
-    fetch("http://127.0.0.1:5000/data/demokit_mapping")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`네트워크 응답 오류: ${response.status}`);
-        }
-        return response.json();
+    fetch('http://localhost:5000/data/demokit_mapping')
+      .then(response => response.json())
+      .then(headerData => {
+        setColumnDefs([
+          {
+            headerName: "",
+            children:[
+              { field: 'timestamp', headerName: 'timestamp', sort: 'desc' },
+            ]
+          },
+          {
+            headerName: "(SM)OperationData -> (SMC)TemperatureandHumiditySensor -> (PROP)Present_Temperature",
+            children:[
+              { field: 'value1', headerName: 'Present_Temperature' , width: 800},
+            ]
+          },
+          {
+            headerName: "(SM)OperationData -> (SMC)Heater -> (PROP)Present_Temperature",
+            children:[
+              { field: 'value2', headerName: 'Present_Temperature' , width: 800},
+            ]
+          },
+          {
+            headerName: "(SM)OperationData -> (SMC)TemperatureandHumiditySensor -> (PROP)Present_Humidity",
+            children:[
+              { field: 'value3', headerName: 'Present_Humidity', width: 800},
+            ]
+          },
+        ]);
       })
-      .then((data) => {
-        // 여기서는 API가 mapping 정보 배열 자체를 반환한다고 가정합니다.
-        setMappingData(data);
-      })
-      .catch((error) => {
-        console.error("mapping API 요청 실패:", error);
+      .catch(error => {
+        console.error('Error fetching column headers:', error);
       });
-
-    // 2. 실제 차트에 표시할 row 데이터 (여기서는 예시용 더미 데이터)
-    // 실제 사용 시 별도의 API 또는 상위 컴포넌트에서 row 데이터를 전달받을 수 있습니다.
-    // const dummyRows = [
-    //   {
-    //     timestamp: "2025-02-16 10:00",
-    //     "Excess Threshold Noise": 10,
-    //     "Excess Threshold Gyro": 20,
-    //     "Shortfall Threshold Gyro": 30,
-    //     "AutomaticOperation Start Wait Time": 40,
-    //     "Operation Cycle Count": 50,
-    //     // mapping에 포함된 다른 key들도 동일하게 추가...
-    //   },
-    //   {
-    //     timestamp: "2025-02-16 10:01",
-    //     "Excess Threshold Noise": 15,
-    //     "Excess Threshold Gyro": 25,
-    //     "Shortfall Threshold Gyro": 35,
-    //     "AutomaticOperation Start Wait Time": 45,
-    //     "Operation Cycle Count": 55,
-    //   },
-    //   // 추가 row 데이터…
-    // ];
-    //setRowData(dummyRows);
   }, []);
 
-  // mapping 정보와 row 데이터가 모두 준비되어야 차트를 구성
-  if (mappingData.length === 0 || rowData.length === 0) {
-    return <div>Loading...</div>;
-  }
+  // Socket.io를 이용해 서버에 연결 및 데이터 수신
+  useEffect(() => {
+    socketRef.current = io('http://localhost:5000');
 
-  // x축 라벨: row 데이터의 timestamp 값
-  const labels = rowData.map((row) => row.timestamp);
+    socketRef.current.on('new_data', (data) => {
+      // 새로운 데이터를 배열의 맨 앞에 추가합니다.
+      setRowData((prevData) => {
+        const newData = [...prevData, data];
 
-  // mappingData 배열을 순회하면서, 각 항목의 semantic_data_en을 데이터 키로, semantic_data_kr를 라벨로 사용하여 datasets 구성
-  const datasets = mappingData.map((mapObj, index) => {
-    const dataKey = mapObj.semantic_data_en;
-    const labelName = mapObj.semantic_data_kr;
-    return {
-      label: labelName,
-      data: rowData.map((row) => row[dataKey]),
-      fill: false,
-      borderColor: getColor(index),
-      tension: 0.1,
+        // AG-Grid 업데이트: addIndex 옵션을 사용해 첫 번째 위치에 추가
+        if (gridRef.current && gridRef.current.api) {
+          gridRef.current.api.applyTransaction({ add: [data] });
+        }
+        return newData;
+      });
+    });
+
+    return () => {
+      socketRef.current.disconnect();
     };
-  });
+  }, []);
 
-  const chartData = {
-    labels,
-    datasets,
+  // 라인 차트 데이터 구성 (Value 1, Value 2)
+  const TempChartData = {
+    labels: rowData.map((item) => item.timestamp),
+    datasets: [
+      {
+        label: "Temperature",
+        data: rowData.map((item) => item.value1),
+        fill: false,
+        borderColor: 'rgb(202, 51, 51)',
+        tension: 0.1,
+      },
+
+    ],
   };
 
-  const chartOptions = {
+  const PressChartData = {
+    labels: rowData.map((item) => item.timestamp),
+    datasets: [
+      {
+        label: 'Pressure',
+        data: rowData.map((item) => item.value1),
+        fill: false,
+        borderColor: 'rgba(75,192,192,1)',
+        tension: 0.1,
+      },
+
+    ],
+  };
+
+  const HumidChartData = {
+    labels: rowData.map((item) => item.timestamp),
+    datasets: [
+      {
+        label: 'Humidity',
+        data: rowData.map((item) => item.value3),
+        fill: false,
+        borderColor: 'rgb(57, 19, 196)',
+        tension: 0.1,
+      },
+
+    ],
+  };
+
+  const TempchartOptions = {
     maintainAspectRatio: false,
     plugins: {
-      title: {
-        display: true,
-        text: "Dynamic Data Chart",
-      },
       legend: {
         position: "top",
+        align: "center",
       },
     },
     scales: {
       x: {
-        title: { display: true, text: "Timestamp" },
+        title: { display: true, text: 'Timestamp' },
       },
       y: {
-        title: { display: true, text: "Value" },
+        title: { display: true, text: 'Value' },
         suggestedMin: 0,
         suggestedMax: 100,
       },
@@ -124,10 +164,30 @@ const DataChart = () => {
   };
 
   return (
-    <div style={{ width: "100%", height: "400px" }}>
-      <Line data={chartData} options={chartOptions} />
+      <div style={{ height: '300px', width: "100%" }} >
+
+      {/* AG-Grid 테이블 영역 */}
+      <div className="ag-theme-balham" style={{ height: '300px', width: '100%' }}>
+        <AgGridReact ref={gridRef} rowData={rowData} columnDefs={columnDefs} />
+      </div>
+
+      <div style={{ display: 'flex', gap: '20px', marginTop: '20px' }}>
+        <div style={{ flex: 1, height: '300px' }}>
+          <Line data={TempChartData} options={TempchartOptions} />
+        </div>
+      </div>
+      <div style={{ display: 'flex', gap: '20px', marginTop: '20px' }}>
+        <div style={{ flex: 1, height: '300px' }}>
+          <Line data={PressChartData} options={TempchartOptions} />
+        </div>
+      </div>
+      <div style={{ display: 'flex', gap: '20px', marginTop: '20px' }}>
+        <div style={{ flex: 1, height: '300px' }}>
+          <Line data={HumidChartData} options={TempchartOptions} />
+        </div>
+      </div>
     </div>
   );
 };
 
-export default DataChart;
+export default RealTimeMultiCharts;

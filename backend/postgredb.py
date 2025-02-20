@@ -5,6 +5,7 @@ from config import CONFIG
 
 print(os.getcwd())
 PostgreSQL = CONFIG['PostgreSQL']
+Demokit = CONFIG['DemoKit']
 
 database= PostgreSQL['DB_Name']
 user= PostgreSQL['User_Name']
@@ -24,9 +25,12 @@ def data_loading():
 
 
 def mapping_data_loading():
-    query = "SELECT semantic_data_en, semantic_data_kr FROM plc_address_mapping"
+    Demokit_lable = Demokit["lable_data"]
+    query = f"SELECT t1.opcua_tag_name,t1.unit,t2.semantic_data_en,t2.semantic_data_kr,t2.data_description_kr FROM opcua_plc_data AS t1 join plc_address_mapping AS t2 ON t1.plc_address = t2.plc_address;"
+
     df = pd.read_sql(query, engine)
     return df
-# excel_file = './backend/demokit_mapping_data.xlsx'
+
+# excel_file = './xml_file/demokit_mapping_data.xlsx'
 # df = pd.read_excel(excel_file)
 # df.to_sql('plc_address_mapping', engine, if_exists='append', index=False)

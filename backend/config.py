@@ -9,7 +9,8 @@ def load_config(filename:str) -> dict:
 CONFIG = {
     "InfluxDB":load_config('./config/InfluxDB.json'),
     "MongoDB":load_config('./config/MongoDB.json'),
-    "PostgreSQL":load_config('./config/PostgreSQL.json')
+    "PostgreSQL":load_config('./config/PostgreSQL.json'),
+    "DemoKit":load_config('./config/DemoKitOPC-UA.json'),
 }
 
 print("CONFIG file loaded")

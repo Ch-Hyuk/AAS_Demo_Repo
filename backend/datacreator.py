@@ -6,25 +6,43 @@ from datetime import datetime
 from influxdb_client import InfluxDBClient, Point
 from config import CONFIG
 
+Demokit = CONFIG["DemoKit"]
+
 #OPC-UA 서버 정보 설정
-SERVER_URL = "opc.tcp://192.168.100.102:4840"
-NODE_ID = "ns=2;s=Heater_Temp"  # 단순화된 노드 ID
+def opc_ua_setting():
+
+    server_url = Demokit["SERVER_URL"]
+    node_id = Demokit["ns_index"]
+
+    return server_url, node_id
+
 
 # OPC-UA 데이터 생성 함수
-def read_plc_data():
+def read_plc_data(server_url, node_id):
+    Demokit_lable = Demokit["lable_data"]
     try:
-        client = Client(SERVER_URL)
+        client = Client(server_url)
         client.connect()
         
         # 변수 노드 찾기
         objects = client.get_objects_node()
-        plc = objects.get_child(["2:NewPLC"])
-        var_comment = plc.get_child(["2:VariableComment"])
-        heater = var_comment.get_child(["2:Heater_Temp"])
+        plc = objects.get_child([node_id+":NewPLC"])
+        var_comment = plc.get_child([node_id+":VariableComment"])
+
+        value1 = var_comment.get_child([node_id+":"+Demokit_lable['lable1']]).get_value()
+        value2 = var_comment.get_child([node_id+":"+Demokit_lable['lable2']]).get_value()
+        value3 = var_comment.get_child([node_id+":"+Demokit_lable['lable3']]).get_value()
         
-        value = heater.get_value()
-        print(f"Heater Temperature: {value}")
-        return value
+        #print(f"Heater Temperature: {value}")
+
+        data = {
+            "timestamp": datetime.now().strftime("%H:%M:%S"),
+            'value1': value1,
+            'value2': value2,
+            'value3': value3,
+
+        }
+        return data
         
     except Exception as e:
         print(f"Error: {e}")
@@ -38,9 +56,12 @@ def read_plc_data():
 def read_random_data():
     data = {
         "timestamp": datetime.now().strftime("%H:%M:%S"),
-        'Excess Threshold Noise': random.randint(0, 100),
-        'Excess Threshold Gyro': random.randint(0, 100),
-        'Shortfall Threshold Gyro': random.randint(0, 100),
+        'value1': random.randint(0, 100),
+        'lable1': 'Temperature',
+        'value2': random.randint(0, 100),
+        'lable2': 'Pressure',
+        'value3': random.randint(0, 100),
+        'lable3': 'Humidity',
     }
     return data
 

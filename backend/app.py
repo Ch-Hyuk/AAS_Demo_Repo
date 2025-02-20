@@ -16,7 +16,7 @@ from routes.value_data_routes import value_data_routes
 
 from sockets.socket_handlers import register_socket_handlers
 
-from datacreator import read_random_data, read_plc_data
+from datacreator import read_random_data, read_plc_data, opc_ua_setting
 
 app = Flask(__name__)
 CORS(app)  # 모든 도메인에서의 요청 허용
@@ -34,10 +34,6 @@ app.register_blueprint(value_data_routes)
 def index():
     return "Main Page"
 
-def generate_data():
-    data = read_random_data()
-    socketio.emit('new_data', data)
-
 
 @socketio.on('connect')
 def handle_connect():
@@ -45,9 +41,13 @@ def handle_connect():
 
 if __name__ == '__main__':
     def data_loop():
+        server_url, node_id = opc_ua_setting()
         while True:
-            eventlet.sleep(2)
-            generate_data()
+            #plc 사용시 read_randoe_data -> read_plc_data
+            #data = read_plc_data(server_url, node_id)
+            data = read_random_data()
+            socketio.emit('new_data', data)
+            eventlet.sleep(1)
 
     socketio.start_background_task(data_loop)
     socketio.run(app, host='0.0.0.0', port=5000)

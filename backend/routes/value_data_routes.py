@@ -16,5 +16,6 @@ def get_data():
 
 @value_data_routes.route('/api/randomdata', methods=['GET'])
 def get_random_data():
+
     data = read_random_data()  # 데이터 가져오기
     return jsonify(data)

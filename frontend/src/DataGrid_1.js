@@ -4,6 +4,13 @@ import { AgGridReact } from 'ag-grid-react';
 // ag‑grid 스타일 적용을 위한 CSS 임포트
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
+import 'ag-grid-community/styles/ag-theme-material.css';
+import { themeAlpine, themeBalham, colorSchemeDarkBlue } from 'ag-grid-community';
+
+const myTheme = themeAlpine.withParams({
+  spacing: 12,
+  accentColor: 'red',
+});
 
 const DataGrid = () => {
   const [rowData, setRowData] = useState([]);
@@ -192,45 +199,39 @@ const DataGrid = () => {
 
   // 자동 그룹 컬럼 정의: 왼쪽에 "Type" 컬럼 표시
   const autoGroupColumnDef = {
-    headerName: 'Type',
+    headerName: 'Name',
     field: 'label',
     cellRendererParams: {
       suppressCount: true
     },
-    width: 300,
-    minWidth: 300,
-    maxWidth: 300,
+    width: 500,
     resizable: true,
     cellStyle: (params) => {
       switch (params.node.level) {
         case 0:
           return { fontWeight: 'bold', color: 'darkblue', fontSize: '20px' };
         case 1:
-          return { fontWeight: 'bold', color: 'blue' };
+          return { fontWeight: 'bold', color: 'black', fontSize: '20px' };
         case 2:
           return { fontWeight: 'normal', color: 'black' };
         default:
-          return { fontWeight: 'normal', color: 'gray' };
+          return { fontWeight: 'normal', color: 'black' };
       }
     }
   };
 
   // 추가 컬럼 정의: Semantic ID 및 Value 컬럼 추가
   const columnDefs = [
-    {
-      field: 'semanticID',
-      headerName: 'Semantic ID',
-      width: 500,
-      minWidth: 300,
-      maxWidth: 500,
-      resizable: true
-    },
+    // {
+    //   field: 'semanticID',
+    //   headerName: 'semanticID',
+    //   width: 500,
+    //   resizable: true
+    // },
     {
       field: 'value',
       headerName: 'Value',
-      width: 200,
-      minWidth: 100,
-      maxWidth: 200,
+      width: 600,
       resizable: true
     }
   ];
@@ -242,11 +243,12 @@ const DataGrid = () => {
   }
 
   return (
-    <div>
-      <h2 style={{ textAlign: "center" }}>DemoKit AAS 구조</h2>
+    <div style={{ height: '100%', width: 1100}}>
+      <h2 style={{ textAlign: "center", width: 1100 }}>DemoKit AAS 구조</h2>
       
-    <div className="ag-theme-alpine" style={{ height: 1000, width: '100%', overflow: 'auto', border: '1px solid #ccc'}}>
+    <div className="ag-theme-alpine" style={{ height: 800, width: '100%', overflow: 'auto', border: '1px solid #ccc'}}>
       <AgGridReact
+
         rowData={rowData}
         columnDefs={columnDefs}
         treeData={true}

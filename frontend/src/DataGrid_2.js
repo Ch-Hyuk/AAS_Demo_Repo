@@ -25,7 +25,7 @@ function App() {
 
   // 🔹 컬럼 정의
   const columnDefs = [
-    { field: "opcua_tag_name", headerName: "OPC-UA Tag Name", flex: 1, width: '100%' },
+    { field: "opcua_tag_name", headerName: "OPC-UA Tag Name", flex: 1, width: 1000 },
     { field: "semantic_data_en", headerName: "Semantic Data(en)", flex: 1, width: '100%' },
     { field: "semantic_data_kr", headerName: "Semantic Data(kr)", flex: 1, width: '100%' },
     { field: "data_description_kr", headerName: "Description(kr)", flex: 1, width: '100%' },
@@ -33,7 +33,7 @@ function App() {
   ];
 
   return (
-    <div style={{ height: '100%', width: 1500}}>
+    <div style={{ height: '100%', width: 1000}}>
       <h2 style={{ textAlign: "center", width: '100%' }}>📊 Mapping Data</h2>
       {/* 고정 높이를 가진 그리드 컨테이너 */}
       <div className="ag-theme-alpine" style={{ height: 800, width: "100%" }}>

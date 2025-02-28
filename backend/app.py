@@ -47,7 +47,7 @@ if __name__ == '__main__':
             #data = read_plc_data(server_url, node_id)
             data = read_random_data()
             socketio.emit('new_data', data)
-            eventlet.sleep(1)
+            eventlet.sleep(20)
 
     socketio.start_background_task(data_loop)
     socketio.run(app, host='0.0.0.0', port=5000)

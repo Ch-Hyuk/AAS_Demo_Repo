@@ -29,20 +29,17 @@ def read_plc_data(server_url, node_id):
         plc = objects.get_child([node_id+":NewPLC"])
         var_comment = plc.get_child([node_id+":VariableComment"])
 
-        value1 = var_comment.get_child([node_id+":"+Demokit_lable['lable1']]).get_value()
-        value2 = var_comment.get_child([node_id+":"+Demokit_lable['lable2']]).get_value()
-        value3 = var_comment.get_child([node_id+":"+Demokit_lable['lable3']]).get_value()
-        
-        #print(f"Heater Temperature: {value}")
 
-        data = {
-            "timestamp": datetime.now().strftime("%H:%M:%S"),
-            'value1': value1,
-            'value2': value2,
-            'value3': value3,
-
+        # OPCUA Tag name 값 읽기
+        values = {
+            "timestamp": datetime.now().strftime("%H:%M:%S")
         }
-        return data
+
+        for label in Demokit_lable:
+            value = var_comment.get_child([node_id+":"+label]).get_value()
+            values[label] = value
+
+        return values
         
     except Exception as e:
         print(f"Error: {e}")

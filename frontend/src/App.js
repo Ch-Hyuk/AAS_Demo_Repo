@@ -7,7 +7,7 @@ import DataChart from "./DataChart";
 function App() {
   return (
     <div style={{ height: "70vh" }}>
-      <Splitter direction="horizontal" initialSizes={[30, 70]}>
+      <Splitter direction="horizontal">
         <div>
           <DataGrid1 />
         </div>

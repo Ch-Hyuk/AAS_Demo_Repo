@@ -14,9 +14,10 @@ from routes.database_routes import db_routes
 from routes.demokit_mapping_routes import demokit_routes
 from routes.value_data_routes import value_data_routes
 
-from sockets.socket_handlers import register_socket_handlers
+#from sockets.socket_handlers import register_socket_handlers
 
-from datacreator import read_random_data, read_plc_data, opc_ua_setting
+from plc_reader import PlcReader
+from datacreator import read_random_data, opc_ua_setting
 
 app = Flask(__name__)
 CORS(app)  # 모든 도메인에서의 요청 허용
@@ -38,6 +39,27 @@ def index():
 @socketio.on('connect')
 def handle_connect():
     print('Client connected')
+
+
+
+
+def data_loop():
+    plc_reader = PlcReader()
+    while True:
+        try:
+            #plc 데이터 read
+            data = plc_reader.read_plc_data()
+
+            #랜덤 데이터 read
+            #data = read_random_data()
+        except Exception as e:
+            print(f"데이터 읽기 중 오류: {e}")
+            data = {}
+        socketio.emit('new_data', data)
+        eventlet.sleep(20)
+
+socketio.start_background_task(data_loop)
+
 
 if __name__ == '__main__':
     def data_loop():

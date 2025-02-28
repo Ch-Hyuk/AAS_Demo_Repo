@@ -1,8 +1,10 @@
 from opcua import Client
 from datetime import datetime
+from config import CONFIG
+
 
 class PlcReader:
-    def __init__(self, config):
+    def __init__(self, config = CONFIG["DemoKit"]):
         self.server_url = config["SERVER_URL"]
         self.node_id = config["ns_index"]
         self.demokit_labels = config["lable_data"]

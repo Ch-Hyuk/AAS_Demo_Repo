@@ -7,10 +7,10 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 import 'ag-grid-community/styles/ag-theme-material.css';
 import { themeAlpine } from 'ag-grid-community';
 
-const myTheme = themeAlpine.withParams({
-  spacing: 12,
-  accentColor: 'red',
-});
+// const myTheme = themeAlpine.withParams({
+//   spacing: 12,
+//   accentColor: 'red',
+// });
 
 // ─────────────────────────────────────────────
 // 재귀 함수: submodelElements 내부의 데이터를 탐색하여 노드 생성
@@ -156,6 +156,7 @@ const DataGrid = () => {
       innerRenderer: (params) => {
         // PNG 파일은 public/images 폴더 내에 있어야 합니다.
         const iconMapping = {
+          AAS: '/AAS.png',
           submodel: '/Submodel.png',
           property: '/Property.png',
           submodelElementCollection: '/SubmodelElementCollection.png',
@@ -242,7 +243,7 @@ const DataGrid = () => {
           label: AASItem.idShort,
           path: [AASItem.idShort],
           children: [],
-          nodeType: 'submodel',
+          nodeType: 'AAS',
           details: AASItem,
         };
 
@@ -326,6 +327,9 @@ const DataGrid = () => {
       console.log('서버 응답:', text);
       const result = JSON.parse(text);
       alert(result.message);
+      // 파일 업로드 후 API PART 선택 그리드(데이터베이스 옵션) 업데이트
+      fetchDatabases();
+      // 메인 데이터 그리드 업데이트
       fetchData();
     } catch (error) {
       console.error('업로드 에러:', error);

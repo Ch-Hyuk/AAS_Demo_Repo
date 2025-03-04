@@ -3,7 +3,7 @@ from flask_cors import CORS  # React와의 통신을 위해 CORS 활성화
 from influxdb_client import InfluxDBClient, WritePrecision, Point
 from influxdb_client.client.write_api import SYNCHRONOUS
 from config import CONFIG
-from datacreator import read_plc_data, read_random_data
+from datacreator import read_random_data
 
 
 import random

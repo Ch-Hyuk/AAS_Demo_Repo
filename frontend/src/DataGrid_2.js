@@ -25,7 +25,7 @@ function App() {
 
   // 🔹 컬럼 정의
   const columnDefs = [
-    { field: "opcua_tag_name", headerName: "OPC-UA Tag Name", flex: 1, width: 1000 },
+    { field: "opcua_tag_name", headerName: "OPC-UA Tag Name", flex: 1, width: 10 },
     { field: "semantic_data_en", headerName: "Semantic Data(en)", flex: 1, width: '100%' },
     { field: "semantic_data_kr", headerName: "Semantic Data(kr)", flex: 1, width: '100%' },
     { field: "data_description_kr", headerName: "Description(kr)", flex: 1, width: '100%' },

@@ -17,7 +17,7 @@ from routes.value_data_routes import value_data_routes
 #from sockets.socket_handlers import register_socket_handlers
 
 from plc_reader import PlcReader
-from datacreator import read_random_data, opc_ua_setting
+from datacreator import read_random_data
 
 app = Flask(__name__)
 CORS(app)  # 모든 도메인에서의 요청 허용
@@ -40,18 +40,17 @@ def index():
 def handle_connect():
     print('Client connected')
 
-
-
+#plc_reader = PlcReader()
 
 def data_loop():
-    plc_reader = PlcReader()
+
     while True:
         try:
             #plc 데이터 read
-            data = plc_reader.read_plc_data()
+            #data = plc_reader.read_plc_data()
 
             #랜덤 데이터 read
-            #data = read_random_data()
+            data = read_random_data()
         except Exception as e:
             print(f"데이터 읽기 중 오류: {e}")
             data = {}
@@ -61,17 +60,11 @@ def data_loop():
 socketio.start_background_task(data_loop)
 
 
-if __name__ == '__main__':
-    def data_loop():
-        server_url, node_id = opc_ua_setting()
-        while True:
-            #plc 사용시 read_randoe_data -> read_plc_data
-            #data = read_plc_data(server_url, node_id)
-            data = read_random_data()
-            socketio.emit('new_data', data)
-            eventlet.sleep(20)
+# @app.teardown_appcontext
+# def cleanup(exception=None):
+#     plc_reader.disconnect()
 
-    socketio.start_background_task(data_loop)
+if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=5000)
 
 # if __name__ == '__main__':

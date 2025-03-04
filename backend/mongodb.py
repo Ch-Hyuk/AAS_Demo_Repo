@@ -11,9 +11,15 @@ mongo_client = MongoClient(mongodb['DB_Client'])
 
 # 특정 데이터베이스 생성
 def DB_create(DB_name):
-    db = mongo_client[DB_name]
+    db_list = mongo_client.list_database_names()
+    if DB_name in db_list:
+        print(f'{DB_name} 데이터베이스가 이미 존재합니다.')
+        return 
 
-    return db
+    else:
+        print(f'{DB_name} 데이터베이스를 생성합니다.')
+        db = mongo_client[DB_name]
+        return db
 
 
 # 특정 컬렉션 생성
@@ -22,6 +28,7 @@ def create_collection(DB):
     for repo in collection:
         repo_list.append(DB[repo])
 
+    print(f'{DB} collection을 생성합니다.')
     return repo_list
     
 # 데이터 삽입 함수

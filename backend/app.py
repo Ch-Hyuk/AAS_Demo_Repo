@@ -55,7 +55,7 @@ def data_loop():
             print(f"데이터 읽기 중 오류: {e}")
             data = {}
         socketio.emit('new_data', data)
-        eventlet.sleep(20)
+        eventlet.sleep(300)
 
 socketio.start_background_task(data_loop)
 

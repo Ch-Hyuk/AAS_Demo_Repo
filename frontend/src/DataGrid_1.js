@@ -37,8 +37,66 @@ const buildNodesFromSubmodelElements = (elements, parentPath = []) => {
       });
     });
   }
+  
+  // 2. file 처리
+  if (elements.file) {
+    const fileList = Array.isArray(elements.file)
+      ? elements.file
+      : [elements.file];
+    fileList.forEach((fileElement) => {
+      nodes.push({
+        id: fileElement.idShort,
+        // 노드 이름은 details의 idShort를 사용
+        label: fileElement.idShort,
+        path: [...parentPath, fileElement.idShort],
+        details: fileElement,
+        semanticID: fileElement.semanticId ? fileElement.semanticId.keys?.key?.value : null,
+        value: fileElement.value !== undefined ? fileElement.value : '',
+        nodeType: 'file',
+      });
+    });
+  }
 
-  // 2. submodelElementCollection 처리 (재귀)
+  // 3. MultilanguageProperty 처리
+  if (elements.multilanguageProperty) {
+    const mlpList = Array.isArray(elements.multilanguageProperty)
+      ? elements.multilanguageProperty
+      : [elements.multilanguageProperty];
+      mlpList.forEach((mlpElement) => {
+      nodes.push({
+        id: mlpElement.idShort,
+        // 노드 이름은 details의 idShort를 사용
+        label: mlpElement.idShort,
+        path: [...parentPath, mlpElement.idShort],
+        details: mlpElement,
+        semanticID: mlpElement.semanticId ? mlpElement.semanticId.keys?.key?.value : null,
+        value: mlpElement.value !== undefined ? mlpElement.value : '',
+        nodeType: 'multilanguageProperty',
+      });
+    });
+  }
+
+  // 4. RelationshipElement 처리
+  if (elements.relationshipElement) {
+    const relList = Array.isArray(elements.relationshipElement)
+      ? elements.relationshipElement
+      : [elements.relationshipElement];
+      relList.forEach((relationshipElement) => {
+      nodes.push({
+        id: relationshipElement.idShort,
+        // 노드 이름은 details의 idShort를 사용
+        label: relationshipElement.idShort,
+        path: [...parentPath, relationshipElement.idShort],
+        details: relationshipElement,
+        semanticID: relationshipElement.semanticId ? relationshipElement.semanticId.keys?.key?.value : null,
+        value: relationshipElement.first.type.keys !== undefined ? relationshipElement.first.type.keys : '',
+        nodeType: 'relationshipElement',
+      });
+    });
+  }
+
+
+  // 5. submodelElementCollection 처리 (재귀)
   if (elements.submodelElementCollection) {
     const collections = Array.isArray(elements.submodelElementCollection)
       ? elements.submodelElementCollection
@@ -61,7 +119,7 @@ const buildNodesFromSubmodelElements = (elements, parentPath = []) => {
     });
   }
 
-  // 3. submodelElementList 처리 (재귀)
+  // 6. submodelElementList 처리 (재귀)
   if (elements.submodelElementList) {
     const listItems = Array.isArray(elements.submodelElementList)
       ? elements.submodelElementList
@@ -84,6 +142,28 @@ const buildNodesFromSubmodelElements = (elements, parentPath = []) => {
     });
   }
 
+  // 7. entity 처리 (재귀)
+  if (elements.entity) {
+    const entityItems = Array.isArray(elements.entity)
+      ? elements.entity
+      : [elements.entity];
+    entityItems.forEach((entityItem, entityIndex) => {
+      const entityItemId = entityItem.idShort || entityItem.id || `entityItem-${entityIndex}`;
+      const entityItemNode = {
+        id: entityItemId,
+        label: entityItemId,
+        path: [...parentPath, entityItemId],
+        details: entityItem,
+        semanticID: entityItem.semanticId ? entityItem.semanticId.keys?.key?.value : null,
+        children: [],
+        nodeType: 'entity',
+      };
+      if (entityItem.statements) {
+        entityItemNode.children = buildNodesFromSubmodelElements(entityItem.statements, entityItemNode.path);
+      }
+      nodes.push(entityItemNode);
+    });
+  }
   return nodes;
 };
 
@@ -91,7 +171,7 @@ const buildNodesFromSubmodelElements = (elements, parentPath = []) => {
 // 좌측 영역: 데이터베이스 옵션 그리드
 // ─────────────────────────────────────────────
 const DatabaseOptionsGrid = ({ options, onSelect, columnDefs }) => (
-  <div className="ag-theme-alpine" style={{ height: 300, width: '100%', overflow: 'auto', border: '1px solid #ccc' }}>
+  <div className="ag-theme-alpine" style={{ height: 630, width: '100%', overflow: 'auto', border: '1px solid #ccc' }}>
     <AgGridReact
       rowData={options}
       columnDefs={columnDefs}
@@ -141,6 +221,7 @@ const DataGrid = () => {
       field: 'name',
       headerName: 'AASX File List',
       width: 400,
+      resizable: true,
       cellStyle: { fontWeight: 'bold', color: 'gray', fontSize: '20px' },
     },
   ];
@@ -159,6 +240,10 @@ const DataGrid = () => {
           AAS: '/AAS.png',
           submodel: '/Submodel.png',
           property: '/Property.png',
+          file: '/File.png',
+          multilanguageProperty: '/multilanguageProperty.png',
+          relationshipElement: '/RelationshipElement.png',
+          entity: '/Entity.png',
           submodelElementCollection: '/SubmodelElementCollection.png',
           submodelElementList: '/SubmodelElementList.png',
         };
@@ -237,7 +322,7 @@ const DataGrid = () => {
 
       // AAS 데이터를 트리 구조로 변환
       const treeNodes = AASData.map((AASItem) => {
-        // 최상위 노드: nodeType 'top'
+        // 최상위 노드: nodeType 'AAS'
         const aNode = {
           id: AASItem.id,
           label: AASItem.idShort,
